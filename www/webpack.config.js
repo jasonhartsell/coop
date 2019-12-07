@@ -4,23 +4,26 @@ const postcssPresetEnv = require('postcss-preset-env');
 const webpack = require('webpack');
 
 const bootstrapPackages = {
-    Alert: 'exports-loader?Alert!bootstrap/js/src/alert',
+    // Alert: 'exports-loader?Alert!bootstrap/js/src/alert',
     // Button: 'exports-loader?Button!bootstrap/js/src/button',
-    Carousel: 'exports-loader?Carousel!bootstrap/js/src/carousel',
-    Collapse: 'exports-loader?Collapse!bootstrap/js/src/collapse',
+    // Carousel: 'exports-loader?Carousel!bootstrap/js/src/carousel',
+    // Collapse: 'exports-loader?Collapse!bootstrap/js/src/collapse',
     // Dropdown: 'exports-loader?Dropdown!bootstrap/js/src/dropdown',
-    Modal: 'exports-loader?Modal!bootstrap/js/src/modal',
+    // Modal: 'exports-loader?Modal!bootstrap/js/src/modal',
     // Popover: 'exports-loader?Popover!bootstrap/js/src/popover',
-    Scrollspy: 'exports-loader?Scrollspy!bootstrap/js/src/scrollspy',
+    // Scrollspy: 'exports-loader?Scrollspy!bootstrap/js/src/scrollspy',
     Tab: 'exports-loader?Tab!bootstrap/js/src/tab',
     // Tooltip: 'exports-loader?Tooltip!bootstrap/js/src/tooltip',
     Util: 'exports-loader?Util!bootstrap/js/src/util'
 };
 
+const Dotenv = require('dotenv-webpack');
+
 module.exports = (env, argv) => {
     let devMode = argv.mode !== 'production';
 
     return {
+        target: 'node',
         mode: devMode ? 'development' : 'production',
         entry: {
             site: './js/main.js', 
@@ -94,7 +97,8 @@ module.exports = (env, argv) => {
             new webpack.ProvidePlugin(bootstrapPackages),
             new MiniCssExtractPlugin({
                 filename: 'css/main.css'
-            })
+            }),
+            new Dotenv()
         ]
     }
 };
