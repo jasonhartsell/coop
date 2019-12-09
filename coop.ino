@@ -8,17 +8,23 @@
 // will forward there all the HTTP requests you send
 BridgeServer server;
 
+// LED PIN
+const int led = 8;
+
+// RELAY PINS to control Linear Actuator
+const int relay1 = 2;
+const int relay2 = 3;
+
+// LDR PIN
+const int ldrPin = A0;
+int ldrValue = 0;
+
 // Override
 bool inOverrideMode = false;
 
-// LDR
-const int ldrPin = A0;
-const int led = 8;
-int ldrValue = 0;
-
 // Time
 unsigned long currentTime = 0;
-unsigned long interval = 1000;
+unsigned long interval = 240000; // 4 min
 unsigned long lastCheck = 0;
 
 // DOOR
@@ -81,6 +87,20 @@ void digitalCommand(BridgeClient client)
   {
     value = client.parseInt();
     digitalWrite(pin, value);
+
+    // Only switch relay based on LED Pin
+    if (pin == led)
+    {
+      int lightValue = digitalRead(pin);
+      if (lightValue == 1)
+      {
+        setRelayStatus(HIGH, LOW);
+      }
+      else
+      {
+        setRelayStatus(LOW, HIGH);
+      }
+    }
   }
   else
   {
@@ -98,14 +118,14 @@ void digitalCommand(BridgeClient client)
   Bridge.put(key, String(value));
 }
 
-void overrideCommand(BridgeClient client) 
+void overrideCommand(BridgeClient client)
 {
   // Set override
   inOverrideMode = true;
   digitalCommand(client);
 }
 
-void resetCommand(BridgeClient client) 
+void resetCommand(BridgeClient client)
 {
   int pin, value;
 
@@ -164,16 +184,30 @@ void process(BridgeClient client)
 
 // Coop custom methods
 
-void checkLight()
+int checkLight()
 {
   if (ldrValue >= OPENLDR)
   {
-    digitalWrite(led, HIGH);
+    return 1;
   }
   else
   {
-    digitalWrite(led, LOW);
+    return 0;
   }
+}
+
+void setRelayStatus(int status1, int status2)
+{
+  digitalWrite(relay1, status1);
+  digitalWrite(relay2, status2);
+}
+
+void relayInit()
+{
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+
+  setRelayStatus(HIGH, HIGH);
 }
 
 // Arduino methods
@@ -182,6 +216,8 @@ void setup()
 {
   pinMode(ldrPin, INPUT);
   pinMode(led, OUTPUT);
+
+  relayInit();
 
   Bridge.begin();
   // Listen for incoming connection only from localhost
@@ -215,12 +251,32 @@ void loop()
     }
   }
 
-  if (currentTime - lastCheck >= interval)
+  if (currentTime - lastCheck > interval)
   {
-    if (inOverrideMode == false) {
-      checkLight();
+    if (inOverrideMode == false)
+    {
+      int lightValue = checkLight();
+      if (lightValue == 1)
+      {
+        digitalWrite(led, HIGH);
+        setRelayStatus(HIGH, LOW);
+      }
+      else
+      {
+        digitalWrite(led, LOW);
+        setRelayStatus(LOW, HIGH);
+      }
     }
 
     lastCheck = currentTime;
   }
+
+  Serial.println("Current Time:");
+  Serial.println(currentTime);
+
+  Serial.println("Last Check:");
+  Serial.println(lastCheck);
+
+  Serial.println("LED ON/OFF:");
+  Serial.println(digitalRead(led));
 }
