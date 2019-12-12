@@ -8,8 +8,6 @@ Built using Visual Studio for Mac / Arduino IDE / Arduino Yun Rev 2
 
 ## TODO
 
-* Hook up linear actuator
-    * Wire and program relay (trigger off of photoresistor values)
 * Test in the wild
     * Add Electrical PVC conduit in coop
     * Solder wires to run linear actuator and photoresistor into coop

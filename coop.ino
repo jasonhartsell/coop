@@ -1,17 +1,19 @@
-// Chicken coop project
+/* 
+ * ===============================
+ * Automated Chicken Coop
+ * ===============================
+ */
 
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
 
-// Listen to the default port 5555, the Yún webserver
-// will forward there all the HTTP requests you send
 BridgeServer server;
 
 // LED PIN
 const int led = 8;
 
-// RELAY PINS to control Linear Actuator
+// RELAY pins to control Linear Actuator
 const int relay1 = 2;
 const int relay2 = 3;
 
@@ -25,25 +27,28 @@ bool inOverrideMode = false;
 // Time
 unsigned long currentTime = 0;
 unsigned long interval = 240000; // 4 min
-unsigned long lastCheck = 0;
+unsigned long previousTime = 0;
+unsigned long overrideInterval = interval / 2;
 
-// DOOR
-const int OPENLDR = 450;
+// LIGHT THRESHOLD
+const int DAYTIME = 300;
 
-// BridgeServer client methods
+/* 
+ * ===============================
+ * BridgeServer client methods
+ * ===============================
+ */
 
 void analogCommand(BridgeClient client)
 {
   int pin, value;
 
-  // Read pin number
   pin = client.parseInt();
 
   // If the next character is a '/' it means we have an URL
   // with a value like: "/analog/5/120"
   if (client.read() == '/')
   {
-    // Read value and execute command
     value = client.parseInt();
     analogWrite(pin, value);
 
@@ -52,14 +57,13 @@ void analogCommand(BridgeClient client)
     client.print(value);
     client.print("}");
 
-    // Update datastore key with the current pin value
+    // Update datastore
     String key = "A";
     key += pin;
     Bridge.put(key, String(value));
   }
   else
   {
-    // Read analog pin
     value = analogRead(pin);
 
     // Send feedback to client
@@ -67,7 +71,7 @@ void analogCommand(BridgeClient client)
     client.print(value);
     client.print("}");
 
-    // Update datastore key with the current pin value
+    // Update datastore
     String key = "A";
     key += pin;
     Bridge.put(key, String(value));
@@ -78,7 +82,6 @@ void digitalCommand(BridgeClient client)
 {
   int pin, value;
 
-  // Read pin number
   pin = client.parseInt();
 
   // If the next character is a '/' it means we have an URL
@@ -88,11 +91,12 @@ void digitalCommand(BridgeClient client)
     value = client.parseInt();
     digitalWrite(pin, value);
 
-    // Only switch relay based on LED Pin
-    if (pin == led)
+    // If Override:
+    // Only switch RELAY based on LED pin
+    if (pin == led && inOverrideMode == true)
     {
-      int lightValue = digitalRead(pin);
-      if (lightValue == 1)
+      int ledValue = digitalRead(pin);
+      if (ledValue == 1)
       {
         setRelayStatus(HIGH, LOW);
       }
@@ -110,9 +114,10 @@ void digitalCommand(BridgeClient client)
   // Send feedback to client
   client.print("{\"value\":");
   client.print(value);
+
   client.print("}");
 
-  // Update datastore key with the current pin value
+  // Update datastore
   String key = "D";
   key += pin;
   Bridge.put(key, String(value));
@@ -125,118 +130,82 @@ void overrideCommand(BridgeClient client)
   digitalCommand(client);
 }
 
-void resetCommand(BridgeClient client)
+void customCommand(BridgeClient client)
 {
-  int pin, value;
-
-  // Unset override
-  inOverrideMode = false;
-
-  if (client.read() != '/')
-  {
-    value = digitalRead(pin);
-  }
+  String action = client.readStringUntil('\r');
 
   // Send feedback to client
-  client.print("{\"value\":");
-  client.print(value);
-  client.print("}");
+  if (action == "reset")
+  {
+    // Unset override
+    inOverrideMode = false;
 
-  // Update datastore key with the current pin value
-  String key = "D";
-  key += pin;
-  Bridge.put(key, String(value));
+    client.print("{\"value\":");
+    client.print("\"");
+    client.print(action);
+    client.print("\"");
+    client.print("}");
+  }
+  else if (action == "time")
+  {
+    client.print("{\"value\":");
+    client.print("\"");
+    client.print(action);
+    client.print("\"");
+    client.print(",\"currentTime\":");
+    client.print(getHours(currentTime));
+    client.print("\":\"");
+    client.print(getMinutes(currentTime));
+    client.print(",\"previousTime\":");
+    client.print(getHours(previousTime));
+    client.print("\":\"");
+    client.print(getMinutes(previousTime));
+    client.print("}");
+  }
+
+  // Update datastore
+  String key = "C";
+  key += action;
+  Bridge.put(key, String(action));
 }
 
 void process(BridgeClient client)
 {
-  // read the command
   String command = client.readStringUntil('/');
 
-  // is "digital" command?
   if (command == "digital")
   {
     digitalCommand(client);
   }
 
-  // is "analog" command?
   if (command == "analog")
   {
     analogCommand(client);
   }
 
-  // is "override" command?
   if (command == "override")
   {
-    currentTime = millis();
-    if (currentTime >= interval)
+    // Initiate override at half the main interval
+    int x;
+    for (x = 0; x < overrideInterval; x++)
     {
-      overrideCommand(client);
+      if (x == (overrideInterval - 1))
+      { 
+        overrideCommand(client);
+      }
     }
   }
 
-  // is "reset override" command?
-  if (command == "reset")
+  if (command == "custom")
   {
-    resetCommand(client);
+    customCommand(client);
   }
 }
 
-// Coop custom methods
-
-int checkLight()
+void runClient()
 {
-  if (ldrValue >= OPENLDR)
-  {
-    return 1;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
-void setRelayStatus(int status1, int status2)
-{
-  digitalWrite(relay1, status1);
-  digitalWrite(relay2, status2);
-}
-
-void relayInit()
-{
-  pinMode(relay1, OUTPUT);
-  pinMode(relay2, OUTPUT);
-
-  setRelayStatus(HIGH, HIGH);
-}
-
-// Arduino methods
-
-void setup()
-{
-  pinMode(ldrPin, INPUT);
-  pinMode(led, OUTPUT);
-
-  relayInit();
-
-  Bridge.begin();
-  // Listen for incoming connection only from localhost
-  // (no one from the external network could connect)
-  server.listenOnLocalhost();
-  server.begin();
-
-  Serial.begin(9600);
-}
-
-void loop()
-{
-  // Get clients coming from server
   BridgeClient client = server.accept();
 
-  ldrValue = analogRead(ldrPin);
-  currentTime = millis();
-
-  // There is a new client?
   if (client)
   {
     if (client.connected())
@@ -246,12 +215,53 @@ void loop()
         // Process request
         process(client);
       }
-      // Close connection and free resources.
+      // Close connection and free resources
       client.stop();
     }
   }
+}
 
-  if (currentTime - lastCheck > interval)
+/* 
+ * ===============================
+ * COOP Controls (LED, LDR, RELAY)
+ * ===============================
+ */
+
+int checkLight()
+{
+  if (ldrValue >= DAYTIME)
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+int getHours(int time)
+{
+  return ((time / 1000) / 60) / 60;
+}
+
+int getMinutes(int time)
+{
+  return (time / 1000) / 60;
+}
+
+void setRelayStatus(int status1, int status2)
+{
+  digitalWrite(relay1, status1);
+  digitalWrite(relay2, status2);
+}
+
+void runCoop()
+{
+  ldrValue = analogRead(ldrPin);
+  currentTime = millis();
+
+  // Check light values and switch LED / RELAY
+  if (currentTime - previousTime > interval)
   {
     if (inOverrideMode == false)
     {
@@ -268,15 +278,75 @@ void loop()
       }
     }
 
-    lastCheck = currentTime;
+    previousTime = currentTime;
   }
+}
 
-  Serial.println("Current Time:");
-  Serial.println(currentTime);
+void runLogs()
+{
+  Serial.println("");
+  Serial.println("CURRENT TIME:");
+  Serial.print(" Hours: ");
+  Serial.print(getHours(currentTime));
+  Serial.print(" Minutes: ");
+  Serial.print(getMinutes(currentTime));
 
-  Serial.println("Last Check:");
-  Serial.println(lastCheck);
+  Serial.println("");
+  Serial.println("PREVIOUS TIME:");
+  Serial.print(" Hours: ");
+  Serial.print(getHours(previousTime));
+  Serial.print(" Minutes: ");
+  Serial.print(getMinutes(previousTime));
 
+  Serial.println("");
+  Serial.println("LIGHT VALUE:");
+  Serial.print(" ");
+  Serial.print(ldrValue);
+
+  Serial.println("");
   Serial.println("LED ON/OFF:");
-  Serial.println(digitalRead(led));
+  Serial.print(" ");
+  Serial.print(digitalRead(led));
+
+  Serial.println("");
+  Serial.println("DAYTIME READING:");
+  Serial.print(" ");
+
+  if (ldrValue >= DAYTIME)
+  {
+    Serial.print("DAYTIME");
+  } else {
+    Serial.print("NIGHTTIME");
+  }
+}
+
+/* 
+ * ===============================
+ * Arduino Methods
+ * ===============================
+ */
+
+void setup()
+{
+  pinMode(ldrPin, INPUT);
+  pinMode(led, OUTPUT);
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+
+  setRelayStatus(HIGH, HIGH);
+
+  Bridge.begin();
+  // Listen for incoming connection only from localhost
+  // (no one from the external network could connect)
+  server.listenOnLocalhost();
+  server.begin();
+
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  runClient();
+  runCoop();
+  runLogs();
 }

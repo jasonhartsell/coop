@@ -6,7 +6,9 @@ window.jQuery = require('jquery');
 window.$ = require('jquery');
 
 const rootPassword = process.env.ROOT_PASSWORD;
-const timeout = 5000; // 5 seconds
+const timeout = 1500; // 1.5 seconds
+
+const DAYTIME = 300;
 
 require('./vendor/bootstrap');
 
@@ -32,17 +34,28 @@ function setOverride($btn, pin, value) {
 
 function resetOverride() {
     $('.btn-group').find('.btn').removeClass('active');
-    ajaxCall('reset/8');
+    ajaxCall('custom/reset');
 }
 
 function loop() {
     // Inputs 
     const $ldrInput = $('#ldr-input');
+    const $daytimeInput = $('#daytime-input');
     const $doorInput = $('#door-input');
+    const $currentTimeInput = $('#current-time-input');
+    const $previousTimeInput = $('#previous-time-input');
 
     const ldrValue = ajaxCall('analog/0');
     ldrValue.then(function (response) {
         let value = JSON.parse(response).value;
+        let dayValue = parseInt(value);
+
+        if (dayValue >= DAYTIME) {
+            $daytimeInput.val('DAYLIGHT');
+        } else {
+            $daytimeInput.val('NIGHTTIME');
+        }   
+
         $ldrInput.val(value);
     });
 
@@ -52,6 +65,16 @@ function loop() {
         let doorValue = value === 1 ? 'OPEN' : 'CLOSED';
 
         $doorInput.val(doorValue);
+    });
+
+    const timeValues = ajaxCall('custom/time');
+    timeValues.then(function (response) {
+        let jsonResponse = JSON.parse(response);
+        let currentTime = jsonResponse.currentTime;
+        let previousTime = jsonResponse.previousTime;
+
+        $currentTimeInput.val(currentTime);
+        $previousTimeInput.val(previousTime);
     });
 
     setTimeout(() => loop(), timeout);
