@@ -6,7 +6,7 @@ window.jQuery = require('jquery');
 window.$ = require('jquery');
 
 const rootPassword = process.env.ROOT_PASSWORD;
-const timeout = 1500; // 1.5 seconds
+const timeout = 5000; // 5 seconds
 
 const DAYTIME = 300;
 

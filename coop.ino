@@ -25,10 +25,9 @@ int ldrValue = 0;
 bool inOverrideMode = false;
 
 // Time
+unsigned long interval = 600000; // 10 min
 unsigned long currentTime = 0;
-unsigned long interval = 240000; // 4 min
 unsigned long previousTime = 0;
-unsigned long overrideInterval = interval / 2;
 
 // LIGHT THRESHOLD
 const int DAYTIME = 300;
@@ -152,15 +151,19 @@ void customCommand(BridgeClient client)
     client.print("\"");
     client.print(action);
     client.print("\"");
-    client.print(",\"currentTime\":");
+    client.print(",\"currentTime\":\"");
     client.print(getHours(currentTime));
-    client.print("\":\"");
+    client.print(" hr : ");
     client.print(getMinutes(currentTime));
-    client.print(",\"previousTime\":");
+    client.print(" min : ");
+    client.print(getSeconds(currentTime));
+    client.print(" sec\",\"previousTime\":\"");
     client.print(getHours(previousTime));
-    client.print("\":\"");
+    client.print(" hr : ");
     client.print(getMinutes(previousTime));
-    client.print("}");
+    client.print(" min : ");
+    client.print(getSeconds(previousTime));
+    client.print(" sec\"}");
   }
 
   // Update datastore
@@ -185,15 +188,7 @@ void process(BridgeClient client)
 
   if (command == "override")
   {
-    // Initiate override at half the main interval
-    int x;
-    for (x = 0; x < overrideInterval; x++)
-    {
-      if (x == (overrideInterval - 1))
-      { 
-        overrideCommand(client);
-      }
-    }
+    overrideCommand(client);
   }
 
   if (command == "custom")
@@ -239,14 +234,19 @@ int checkLight()
   }
 }
 
-int getHours(int time)
+unsigned long getHours(unsigned long time)
 {
   return ((time / 1000) / 60) / 60;
 }
 
-int getMinutes(int time)
+unsigned long getMinutes(unsigned long time)
 {
   return (time / 1000) / 60;
+}
+
+unsigned long getSeconds(unsigned long time)
+{
+  return (time / 1000);
 }
 
 void setRelayStatus(int status1, int status2)
@@ -290,6 +290,8 @@ void runLogs()
   Serial.print(getHours(currentTime));
   Serial.print(" Minutes: ");
   Serial.print(getMinutes(currentTime));
+  Serial.print(" Seconds: ");
+  Serial.print(getSeconds(currentTime));
 
   Serial.println("");
   Serial.println("PREVIOUS TIME:");
@@ -297,6 +299,8 @@ void runLogs()
   Serial.print(getHours(previousTime));
   Serial.print(" Minutes: ");
   Serial.print(getMinutes(previousTime));
+  Serial.print(" Seconds: ");
+  Serial.print(getSeconds(previousTime));
 
   Serial.println("");
   Serial.println("LIGHT VALUE:");
