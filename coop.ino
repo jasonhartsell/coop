@@ -30,7 +30,7 @@ unsigned long currentTime = 0;
 unsigned long previousTime = 0;
 
 // LIGHT THRESHOLD
-const int DAYTIME = 300;
+const int daytime = 300;
 
 /* 
  * ===============================
@@ -94,8 +94,7 @@ void digitalCommand(BridgeClient client)
     // Only switch RELAY based on LED pin
     if (pin == led && inOverrideMode == true)
     {
-      int ledValue = digitalRead(pin);
-      if (ledValue == 1)
+      if (value == 1)
       {
         setRelayStatus(HIGH, LOW);
       }
@@ -224,7 +223,7 @@ void runClient()
 
 int checkLight()
 {
-  if (ldrValue >= DAYTIME)
+  if (ldrValue >= daytime)
   {
     return 1;
   }
@@ -282,8 +281,29 @@ void runCoop()
   }
 }
 
-void runLogs()
+void runSerialLogs()
 {
+  Serial.println("");
+  Serial.println("LIGHT READING:");
+  Serial.print(" ");
+  Serial.print(ldrValue);
+
+  Serial.println("");
+  Serial.println("TIME OF DAY:");
+  Serial.print(" ");
+
+  if (ldrValue >= daytime)
+  {
+    Serial.print("DAY");
+  } else {
+    Serial.print("NIGHT");
+  }
+
+  Serial.println("");
+  Serial.println("LED ON/OFF:");
+  Serial.print(" ");
+  Serial.print(digitalRead(led));
+  
   Serial.println("");
   Serial.println("CURRENT TIME:");
   Serial.print(" Hours: ");
@@ -301,27 +321,6 @@ void runLogs()
   Serial.print(getMinutes(previousTime));
   Serial.print(" Seconds: ");
   Serial.print(getSeconds(previousTime));
-
-  Serial.println("");
-  Serial.println("LIGHT VALUE:");
-  Serial.print(" ");
-  Serial.print(ldrValue);
-
-  Serial.println("");
-  Serial.println("LED ON/OFF:");
-  Serial.print(" ");
-  Serial.print(digitalRead(led));
-
-  Serial.println("");
-  Serial.println("DAYTIME READING:");
-  Serial.print(" ");
-
-  if (ldrValue >= DAYTIME)
-  {
-    Serial.print("DAYTIME");
-  } else {
-    Serial.print("NIGHTTIME");
-  }
 }
 
 /* 
@@ -352,5 +351,8 @@ void loop()
 {
   runClient();
   runCoop();
-  runLogs();
+
+  if (Serial.available()) {
+    runSerialLogs();
+  }
 }

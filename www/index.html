@@ -25,58 +25,59 @@
     <div class="row">
       <div class="col-sm">
         <div class="card mb-3">
-            <div class="card-body">
-              <h5 class="card-title">Coop Readings:</h5>
+          <img src="images/coop.jpg" class="card-img-top" alt="Coop">
+          <div class="card-body">
 
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="inputGroup-sizing-default">Light Reading:</span>
-                </div>
-                <input id="ldr-input" type="text" disabled class="form-control bg-white" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-                <input id="daytime-input" type="text" disabled class="form-control bg-white" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <form>
+              <div class="form-group">
+                <label for="ldr-input" class="badge badge-secondary">Light Reading:</label>
+                <input id="ldr-input" type="text" disabled class="form-control bg-white" aria-label="Default"
+                  aria-describedby="inputGroup-sizing-default">
+
+                <label for="daytime-input" class="badge badge-secondary">Time of Day:</label>
+                <input id="daytime-input" type="text" disabled class="form-control bg-white" aria-label="Default"
+                  aria-describedby="inputGroup-sizing-default">
+
+                <label for="door-input" class="badge badge-secondary">Door Reading:</label>
+                <input id="door-input" type="text" disabled class="form-control bg-white" aria-label="Small"
+                aria-describedby="inputGroup-sizing-sm">
+
+                <label for="current-time-input" class="badge badge-secondary">Current Time:</label>
+                <input id="current-time-input" type="text" disabled class="form-control bg-white" aria-label="Small"
+                  aria-describedby="inputGroup-sizing-sm">
+
+                <span for="previous-time-input" class="badge badge-secondary">Previous Time:</span>
+                <input id="previous-time-input" type="text" disabled class="form-control bg-white" aria-label="Small"
+                  aria-describedby="inputGroup-sizing-sm">
               </div>
+            </form>
+          </div>
+        </div>
 
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="inputGroup-sizing-sm">Door Reading:</span>
+        <p>
+          <a class="btn btn-danger btn-block view-override-panel" data-toggle="collapse" href="#overridePanel" role="button" aria-expanded="false" aria-controls="overridePanel"></a>
+        </p>
+        
+        <div class="col-sm">
+          <div class="collapse" id="overridePanel">
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="btn-group d-flex" role="group" aria-label="overrides">
+                  <button id="open-btn" type="button" class="open-btn btn btn-outline-danger">OPEN</button>
+                  <button id="close-btn" type="button" class="close-btn btn btn-outline-success">CLOSE</button>
                 </div>
-                <input id="door-input" type="text" disabled class="form-control bg-white" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
-              </div>
-
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="inputGroup-sizing-sm">Current Time:</span>
-                </div>
-                <input id="current-time-input" type="text" disabled class="form-control bg-white" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
-              </div>
-
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="inputGroup-sizing-sm">Previous Time:</span>
-                </div>
-                <input id="previous-time-input" type="text" disabled class="form-control bg-white" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                <button id="reset-btn" type="button"
+                  class="reset-btn btn btn-secondary btn-lg btn-block mt-4">RESET</button>
               </div>
             </div>
+          </div>
         </div>
       </div>
-      <div class="col-sm">
-          <div class="card mb-3">
-              <div class="card-body">
-                <h5 class="card-title">Manual Overrides:</h5>
-                <div class="btn-group d-flex" role="group" aria-label="overrides">
-                    <button id="open-btn" type="button" class="open-btn btn btn-outline-danger">OPEN</button>
-                    <button id="close-btn" type="button" class="close-btn btn btn-outline-success">CLOSE</button>
-                </div>
-                <button id="reset-btn" type="button" class="reset-btn btn btn-secondary btn-lg btn-block mt-4">RESET</button>
-              </div>
-          </div>
-      </div>
     </div>
-  </div>
 
-  <footer></footer>
+    <footer></footer>
 
-  <script src="dist/js/site.js"></script>
+    <script src="dist/js/site.js"></script>
 </body>
 
 </html>

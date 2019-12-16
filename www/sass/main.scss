@@ -4,3 +4,10 @@
 // Bootstrap
 @import "node_modules/bootstrap/scss/bootstrap";
 
+.view-override-panel[aria-expanded="false"]:before {
+  content:"(+) Show Override Panel";
+}
+
+.view-override-panel[aria-expanded="true"]:before {
+  content:"(-) Hide Override Panel";
+}

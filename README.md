@@ -8,9 +8,4 @@ Built using Visual Studio for Mac / Arduino IDE / Arduino Yun Rev 2
 
 ## TODO
 
-* Test in the wild
-    * Add Electrical PVC conduit in coop
-    * Solder wires to run linear actuator and photoresistor into coop
-    * Apply heat shrink tubing
-    * Secure linear actuator and photoresistor into coop
 * Document in depth (add info and pics)

@@ -5,7 +5,7 @@ const webpack = require('webpack');
 
 const bootstrapPackages = {
     Button: 'exports-loader?Button!bootstrap/js/src/button',
-    Tab: 'exports-loader?Tab!bootstrap/js/src/tab',
+    Collapse: 'exports-loader?Collapse!bootstrap/js/src/collapse',
     Util: 'exports-loader?Util!bootstrap/js/src/util'
 };
 
