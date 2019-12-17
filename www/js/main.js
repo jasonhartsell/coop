@@ -15,7 +15,7 @@ function ajaxCall(path) {
     if (path && typeof rootPassword !== 'undefined' && rootPassword) {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: 'http://' + 'root:' + rootPassword + '@coop.local/arduino/' + path,
+                url: 'http://' + 'root:' + rootPassword + '@' + window.location.host + '/arduino/' + path,
                 method: 'GET',
                 timeout: 5000
             })
