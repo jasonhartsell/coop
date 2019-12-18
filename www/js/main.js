@@ -5,24 +5,21 @@ var Promise = require('es6-promise');
 window.jQuery = require('jquery');
 window.$ = require('jquery');
 
-const rootPassword = process.env.ROOT_PASSWORD;
 const timeout = 10000; // 10 seconds
 const daytime = 300;
 
 require('./vendor/bootstrap');
 
 function ajaxCall(path) {
-    if (path && typeof rootPassword !== 'undefined' && rootPassword) {
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: 'http://' + 'root:' + rootPassword + '@' + window.location.host + '/arduino/' + path,
-                method: 'GET',
-                timeout: 5000
-            })
-            .done(data => resolve(data))
-            .fail((response, textStatus, error) => reject(error));
-        });
-    }
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: 'http://' + window.location.host + '/arduino/' + path,
+            method: 'GET',
+            timeout: 5000
+        })
+        .done(data => resolve(data))
+        .fail((response, textStatus, error) => reject(error));
+    });
 }
 
 function setOverride($btn, pin, value) {

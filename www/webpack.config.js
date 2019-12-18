@@ -9,8 +9,6 @@ const bootstrapPackages = {
     Util: 'exports-loader?Util!bootstrap/js/src/util'
 };
 
-const Dotenv = require('dotenv-webpack');
-
 module.exports = (env, argv) => {
     let devMode = argv.mode !== 'production';
 
@@ -89,8 +87,7 @@ module.exports = (env, argv) => {
             new webpack.ProvidePlugin(bootstrapPackages),
             new MiniCssExtractPlugin({
                 filename: 'css/main.css'
-            }),
-            new Dotenv()
+            })
         ]
     }
 };
