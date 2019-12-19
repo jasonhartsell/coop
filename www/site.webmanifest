@@ -1,0 +1,12 @@
+{
+  "short_name": "COOP",
+  "name": "COOP",
+  "icons": [{
+    "src": "images/icon.png",
+    "type": "image/png",
+    "sizes": "192x192"
+  }],
+  "start_url": "/sd/coop/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}
