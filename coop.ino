@@ -55,11 +55,6 @@ void analogCommand(BridgeClient client)
     client.print("{\"value\":");
     client.print(value);
     client.print("}");
-
-    // Update datastore
-    String key = "A";
-    key += pin;
-    Bridge.put(key, String(value));
   }
   else
   {
@@ -69,12 +64,12 @@ void analogCommand(BridgeClient client)
     client.print("{\"value\":");
     client.print(value);
     client.print("}");
-
-    // Update datastore
-    String key = "A";
-    key += pin;
-    Bridge.put(key, String(value));
   }
+
+  // Update datastore
+  String key = "A";
+  key += pin;
+  Bridge.put(key, String(value));
 }
 
 void digitalCommand(BridgeClient client)
@@ -112,7 +107,6 @@ void digitalCommand(BridgeClient client)
   // Send feedback to client
   client.print("{\"value\":");
   client.print(value);
-
   client.print("}");
 
   // Update datastore
@@ -281,48 +275,6 @@ void runCoop()
   }
 }
 
-void runSerialLogs()
-{
-  Serial.println("");
-  Serial.println("LIGHT READING:");
-  Serial.print(" ");
-  Serial.print(ldrValue);
-
-  Serial.println("");
-  Serial.println("TIME OF DAY:");
-  Serial.print(" ");
-
-  if (ldrValue >= daytime)
-  {
-    Serial.print("DAY");
-  } else {
-    Serial.print("NIGHT");
-  }
-
-  Serial.println("");
-  Serial.println("LED ON/OFF:");
-  Serial.print(" ");
-  Serial.print(digitalRead(led));
-  
-  Serial.println("");
-  Serial.println("CURRENT TIME:");
-  Serial.print(" Hours: ");
-  Serial.print(getHours(currentTime));
-  Serial.print(" Minutes: ");
-  Serial.print(getMinutes(currentTime));
-  Serial.print(" Seconds: ");
-  Serial.print(getSeconds(currentTime));
-
-  Serial.println("");
-  Serial.println("PREVIOUS TIME:");
-  Serial.print(" Hours: ");
-  Serial.print(getHours(previousTime));
-  Serial.print(" Minutes: ");
-  Serial.print(getMinutes(previousTime));
-  Serial.print(" Seconds: ");
-  Serial.print(getSeconds(previousTime));
-}
-
 /* 
  * ===============================
  * Arduino Methods
@@ -338,10 +290,11 @@ void setup()
 
   setRelayStatus(HIGH, HIGH);
 
+  // Set delay in case of reboot
+  // to allow time for Bridge to reconnect
+  delay(60000);
   Bridge.begin();
-  // Listen for incoming connection only from localhost
-  // (no one from the external network could connect)
-  server.listenOnLocalhost();
+  server.noListenOnLocalhost();
   server.begin();
 
   Serial.begin(9600);
@@ -351,8 +304,4 @@ void loop()
 {
   runClient();
   runCoop();
-
-  if (Serial.available()) {
-    runSerialLogs();
-  }
 }
