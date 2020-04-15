@@ -4,6 +4,14 @@
 // Bootstrap
 @import "node_modules/bootstrap/scss/bootstrap";
 
+.container {
+  max-width: 576px;
+}
+
+.card {
+  border: none;
+}
+
 .view-override-panel[aria-expanded="false"]:before {
   content:"(+) Show Override Panel";
 }

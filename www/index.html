@@ -19,7 +19,7 @@
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
 
-  <header class="container-fluid pt-2 pb-2 mb-4 bg-dark text-white">
+  <header class="container-fluid pt-2 pb-1 bg-dark text-white text-uppercase text-center">
     <h1>Chicken Coop</h1>
   </header>
 
@@ -53,23 +53,18 @@
                 aria-describedby="inputGroup-sizing-sm">
               </div>
             </form>
-          </div>
-        </div>
 
-        <p>
-          <a class="btn btn-danger btn-block view-override-panel" data-toggle="collapse" href="#overridePanel" role="button" aria-expanded="false" aria-controls="overridePanel"></a>
-        </p>
-        
-        <div class="col-sm">
-          <div class="collapse" id="overridePanel">
-            <div class="card mb-3">
-              <div class="card-body">
-                <div class="btn-group d-flex" role="group" aria-label="overrides">
-                  <button id="open-btn" type="button" class="open-btn btn btn-outline-danger">OPEN</button>
-                  <button id="close-btn" type="button" class="close-btn btn btn-outline-success">CLOSE</button>
+            <a class="btn btn-danger btn-block view-override-panel" data-toggle="collapse" href="#overridePanel" role="button" aria-expanded="false" aria-controls="overridePanel"></a>
+            <div class="collapse" id="overridePanel">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="btn-group d-flex" role="group" aria-label="overrides">
+                    <button id="open-btn" type="button" class="open-btn btn btn-outline-danger">OPEN</button>
+                    <button id="close-btn" type="button" class="close-btn btn btn-outline-success">CLOSE</button>
+                  </div>
+                  <button id="reset-btn" type="button"
+                    class="reset-btn btn btn-secondary btn-lg btn-block mt-4">RESET</button>
                 </div>
-                <button id="reset-btn" type="button"
-                  class="reset-btn btn btn-secondary btn-lg btn-block mt-4">RESET</button>
               </div>
             </div>
           </div>
