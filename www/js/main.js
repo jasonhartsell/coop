@@ -12,11 +12,18 @@ const coop = {
         o: 'OPEN',
         c: 'CLOSED'
     },
+    led: {
+        on: 'ON',
+        off: 'OFF'
+    },
     time: {
         d: 'DAY',
-        n: 'NIGHT'
+        n: 'NIGHT',
+        t: 'TWILIGHT'
     }
 };
+const daytime = 300;
+const nighttime = 65;
 
 function ajaxCall(path) {
     return new Promise((resolve, reject) => {
@@ -44,10 +51,11 @@ function resetOverride($btnGroupBtn) {
 
 function loop() {
     // Inputs 
-    const $ldrInput = $('#ldr-input');
+    const $currentTimeInput = $('#current-time-input');
     const $daytimeInput = $('#daytime-input');
     const $doorInput = $('#door-input');
-    const $currentTimeInput = $('#current-time-input');
+    const $ledInput = $('#led-input');
+    const $ldrInput = $('#ldr-input');
     const $previousTimeInput = $('#previous-time-input');
 
     const timeValues = ajaxCall('custom/time');
@@ -65,18 +73,37 @@ function loop() {
         ldrValue.then(function (response) {
             let value = JSON.parse(response).value;
             $ldrInput.val(value);
+
+            let timeOfDay = null;
+            if (value >= daytime) {
+                timeOfDay = coop.time.d; // Daytime
+            } else if (value <= nighttime) {
+                timeOfDay = coop.time.n; // Nighttime
+            } else {
+                timeOfDay = coop.time.t; // Twilight
+            }
+
+            $daytimeInput.val(timeOfDay);
         })
         .catch(() => { console.error('LDR call failed...'); });
+    })
+    .then(function () {
+        const relayValue = ajaxCall('digital/2');
+        relayValue.then(function (response) {
+            let value = JSON.parse(response).value;
+            let relayState = value === 1 ? coop.door.o : coop.door.c;
+
+            $doorInput.val(relayState);
+        })
+        .catch(() => { console.error('Relay call failed...'); });
     })
     .then(function () {
         const ledValue = ajaxCall('digital/8');
         ledValue.then(function (response) {
             let value = JSON.parse(response).value;
-            let dayValue = value === 1 ? coop.time.d : coop.time.n;
-            let doorValue = value === 1 ? coop.door.o : coop.door.c;
+            let ledState = value === 1 ? coop.led.on : coop.led.off;
 
-            $daytimeInput.val(dayValue);
-            $doorInput.val(doorValue);
+            $ledInput.val(ledState);
         })
         .catch(() => { console.error('LED call failed...'); });
     })
@@ -89,7 +116,7 @@ function loop() {
     const $openBtn = $('#open-btn');
     const $resetBtn = $('#reset-btn');
     const $overridePanel = $('#overridePanel');
-    const $btnGroupBtn = $('.btn-group').find('.btn')
+    const $btnGroupBtn = $('.btn-group').find('.btn');
 
     $closeBtn.off('click').on('click', function () {
         const $btn = $('.close-btn');
@@ -104,10 +131,10 @@ function loop() {
     $resetBtn.off('click').on('click', function () {
         resetOverride($btnGroupBtn);
     });
-    
+
     $overridePanel.on('shown.bs.collapse', function () {
         $('html, body').animate({
-           scrollTop: $overridePanel.offset().top
+            scrollTop: $overridePanel.offset().top
         }, 1000);
     });
 

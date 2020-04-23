@@ -25,12 +25,13 @@ int ldrValue = 0;
 bool inOverrideMode = false;
 
 // Time
-unsigned long interval = 600000; // 10 min
+unsigned long interval = 300000; // 5 min
 unsigned long currentTime = 0;
 unsigned long previousTime = 0;
 
-// LIGHT THRESHOLD
+// LIGHT THRESHOLDS
 const int daytime = 300;
+const int nighttime = 65;
 
 /* 
  * ===============================
@@ -219,12 +220,14 @@ int checkLight()
 {
   if (ldrValue >= daytime)
   {
-    return 1;
+    return 1; // Daytime
   }
-  else
+  else if (ldrValue <= nighttime)
   {
-    return 0;
+    return 0; // Nighttime
   }
+
+  return 2; // Twilight
 }
 
 unsigned long getHours(unsigned long time)
@@ -259,15 +262,18 @@ void runCoop()
     if (inOverrideMode == false)
     {
       int lightValue = checkLight();
-      if (lightValue == 1)
-      {
-        digitalWrite(led, HIGH);
-        setRelayStatus(HIGH, LOW);
-      }
-      else
-      {
-        digitalWrite(led, LOW);
-        setRelayStatus(LOW, HIGH);
+
+      if (lightValue != 2) { // Not Twilight
+        if (lightValue == 1)
+        {
+          digitalWrite(led, HIGH);
+          setRelayStatus(HIGH, LOW);
+        }
+        else
+        {
+          digitalWrite(led, LOW);
+          setRelayStatus(LOW, HIGH);
+        }
       }
     }
 
