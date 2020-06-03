@@ -22,7 +22,7 @@ const coop = {
         t: 'TWILIGHT'
     }
 };
-const daytime = 300;
+const daytime = 250;
 const nighttime = 65;
 
 function ajaxCall(path) {
