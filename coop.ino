@@ -31,7 +31,7 @@ unsigned long previousTime = 0;
 
 // LIGHT THRESHOLDS
 const int daytime = 250;
-const int nighttime = 65;
+const int nighttime = 50;
 
 /* 
  * ===============================
