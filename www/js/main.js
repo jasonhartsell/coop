@@ -23,7 +23,7 @@ const coop = {
     }
 };
 const daytime = 250;
-const nighttime = 0;
+const nighttime = 3;
 
 function ajaxCall(path) {
     return new Promise((resolve, reject) => {
