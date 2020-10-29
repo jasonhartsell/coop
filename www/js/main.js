@@ -49,8 +49,8 @@ function resetOverride($btnGroupBtn) {
     ajaxCall('custom/reset');
 }
 
-function loop() {
-    // Inputs 
+function runCoop() {
+    // Inputs
     const $currentTimeInput = $('#current-time-input');
     const $daytimeInput = $('#daytime-input');
     const $doorInput = $('#door-input');
@@ -107,7 +107,15 @@ function loop() {
         })
         .catch(() => { console.error('LED call failed...'); });
     })
-    .then(() => loop());
+    .then(() => runCoop());
+}
+
+function refreshCoopPic() {
+    const coopImg = $('#coop-cam').find('img');
+
+    let date = new Date();
+    coopImg.attr('src', 'images/coopcam.jpg?' + date.getTime());
+    setTimeout(refreshCoopPic, 5000);
 }
 
 (function () {
@@ -138,5 +146,6 @@ function loop() {
         }, 1000);
     });
 
-    loop();
+    runCoop();
+    refreshCoopPic();
 })();

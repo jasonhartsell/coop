@@ -2,20 +2,56 @@
 @charset "UTF-8";
 
 // Bootstrap
-@import "node_modules/bootstrap/scss/bootstrap";
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/tables";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/button-group";
+@import "~bootstrap/scss/input-group";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/utilities";
+
+$coop-cntr-width: 576px;
+$coop-cam-bg: #ca753c !default;
+$coop-cam-sm-ht: 185px;
+$coop-cam-lg-ht: 264px;
+$show-override: "(+) Show Override Panel";
+$hide-override: "(-) Hide Override Panel";
 
 .container {
-  max-width: 576px;
+  max-width: $coop-cntr-width;
 }
 
 .card {
   border: none;
 }
 
+.coop-cam {
+  background: $coop-cam-bg;
+
+  @include media-breakpoint-down(xs) {
+    min-height: $coop-cam-sm-ht;
+  }
+
+  @include media-breakpoint-up(xs) {
+    min-height: $coop-cam-lg-ht;
+  }
+}
+
 .view-override-panel[aria-expanded="false"]:before {
-  content:"(+) Show Override Panel";
+  content: $show-override;
 }
 
 .view-override-panel[aria-expanded="true"]:before {
-  content:"(-) Hide Override Panel";
+  content: $hide-override;
 }

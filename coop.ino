@@ -7,8 +7,10 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+#include <Process.h>
 
 BridgeServer server;
+Process picture;
 
 // LED PIN
 const int led = 8;
@@ -281,6 +283,12 @@ void runCoop()
   }
 }
 
+void runCoopCam() {
+  while(!picture.running()) {
+    picture.runShellCommandAsynchronously("fswebcam -S 15 --jpeg 65 --no-banner -r 1280x720 /mnt/sda1/arduino/www/coop/images/coopcam.jpg");
+  }
+}
+
 /* 
  * ===============================
  * Arduino Methods
@@ -302,12 +310,11 @@ void setup()
   Bridge.begin();
   server.noListenOnLocalhost();
   server.begin();
-
-  Serial.begin(9600);
 }
 
 void loop()
 {
   runClient();
   runCoop();
+  runCoopCam();
 }
