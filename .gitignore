@@ -3,3 +3,5 @@
 node_modules/
 .DS_Store
 www/dist/
+coop.ino.with_bootloader.yun.hex
+coop.ino.yun.hex

@@ -23,7 +23,10 @@ const coop = {
     }
 };
 const daytime = 250;
-const nighttime = 3;
+const nighttime = 15;
+
+let lightValue1 = 0;
+let lightValue2 = 0;
 
 function ajaxCall(path) {
     return new Promise((resolve, reject) => {
@@ -56,9 +59,13 @@ function runCoop() {
     const $doorInput = $('#door-input');
     const $ledInput = $('#led-input');
     const $ldrInput = $('#ldr-input');
+    const $ldrInput1 = $('#ldr-input1');
+    const $ldrInput2 = $('#ldr-input2');
+    const $openTimeInput = $('#open-time-input');
+    const $closeTimeInput = $('#close-time-input');
     const $previousTimeInput = $('#previous-time-input');
-
     const timeValues = ajaxCall('custom/time');
+
     timeValues.then(function (response) {
         let jsonResponse = JSON.parse(response);
         let currentTime = jsonResponse.currentTime;
@@ -69,23 +76,37 @@ function runCoop() {
     })
     .catch(() => { console.error('Time call failed...'); })
     .then(function () {
-        const ldrValue = ajaxCall('analog/0');
-        ldrValue.then(function (response) {
-            let value = JSON.parse(response).value;
-            $ldrInput.val(value);
+        const ldrValue1 = ajaxCall('analog/0');
 
-            let timeOfDay = null;
-            if (value >= daytime) {
-                timeOfDay = coop.time.d; // Daytime
-            } else if (value <= nighttime) {
-                timeOfDay = coop.time.n; // Nighttime
-            } else {
-                timeOfDay = coop.time.t; // Twilight
-            }
-
-            $daytimeInput.val(timeOfDay);
+        ldrValue1.then(function (response) {
+            lightValue1 = JSON.parse(response).value;
         })
-        .catch(() => { console.error('LDR call failed...'); });
+        .catch(() => { console.error('LDR1 call failed...'); });
+    })
+    .then(function () {
+        const ldrValue2 = ajaxCall('analog/1');
+
+        ldrValue2.then(function (response) {
+            lightValue2 = JSON.parse(response).value;
+        })
+        .catch(() => { console.error('LDR2 call failed...'); });
+    })
+    .then(function () {
+        let ldrValue = (lightValue1 + lightValue2) / 2;
+        $ldrInput.val(ldrValue);
+        $ldrInput1.val(lightValue1);
+        $ldrInput2.val(lightValue2);
+
+        let timeOfDay = null;
+        if (ldrValue >= daytime) {
+            timeOfDay = coop.time.d; // Daytime
+        } else if (ldrValue <= nighttime) {
+            timeOfDay = coop.time.n; // Nighttime
+        } else {
+            timeOfDay = coop.time.t; // Twilight
+        }
+
+        $daytimeInput.val(timeOfDay);
     })
     .then(function () {
         const relayValue = ajaxCall('digital/2');
@@ -106,6 +127,19 @@ function runCoop() {
             $ledInput.val(ledState);
         })
         .catch(() => { console.error('LED call failed...'); });
+    })
+    .then(function () {
+        const openCloseValues = ajaxCall('custom/openclose');
+
+        openCloseValues.then(function (response) {
+            let jsonResponse = JSON.parse(response);
+            let currentTime = jsonResponse.currentTime;
+            let previousTime = jsonResponse.previousTime;
+    
+            $openTimeInput.val(currentTime);
+            $closeTimeInput.val(previousTime);
+        })
+        .catch(() => { console.error('Open/Close call failed...'); });
     })
     .then(() => runCoop());
 }
